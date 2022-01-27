@@ -1,0 +1,27 @@
+---
+title: "AoC 2015 Day 1"
+output: github_document
+---
+
+```{r setup}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+library(tidyverse)
+```
+
+
+This is the input I was given:
+```{r echo=FALSE}
+input <- read.table("Day1_Input1.csv")
+input <- input$V1
+print(input)
+```
+
+A quick and dirty solution would be to count the nos of '(' and ')' and then take the difference to determine the floor.
+
+```{r }
+up   <- str_count(input, "\\(")
+down <- str_count(input, "\\)")
+floor <- up - down 
+```
+
+Santa goes up `r up` floors and down `r down` floors taking him to floor `r floor`.
