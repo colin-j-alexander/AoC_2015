@@ -82,7 +82,7 @@ Plot Santa's path to see his route...
 cbind(move=1:length(floor),floor) %>% 
   as.data.frame() %>% 
   ggplot(aes(x=move,y=floor)) + 
-  geom_line()
+  geom_step()
 ```
 
 Someone's been pulling his leg! How many times does he actually pass through his final destination floor of 138 before the end of his instructions?
