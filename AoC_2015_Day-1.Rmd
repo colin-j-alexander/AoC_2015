@@ -24,4 +24,4 @@ down <- str_count(input, "\\)")
 floor <- up - down 
 ```
 
-Santa goes up `r up` floors and down `r down` floors taking him to floor `r floor`.
+Santa goes `up =` `r up` floors and `down =` `r down` floors taking him to `floor =` `r floor`.
