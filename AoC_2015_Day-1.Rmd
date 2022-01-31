@@ -3,14 +3,30 @@ title: "AoC 2015 Day 1"
 output: github_document
 ---
 
-```{r setup}
-knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```{r setup, echo = FALSE, warning = FALSE, message = FALSE}
+#knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 library(tidyverse)
 ```
 
+## PART 1
+Santa is trying to deliver presents in a large apartment building, but he can't find the right floor - the directions he got are a little confusing. He starts on the ground floor (floor 0) and then follows the instructions one character at a time.
 
+An opening parenthesis, (, means he should go up one floor, and a closing parenthesis, ), means he should go down one floor.
+
+The apartment building is very tall, and the basement is very deep; he will never find the top or bottom floors.
+
+For example:
+
+(()) and ()() both result in floor 0.
+((( and (()(()( both result in floor 3.
+))((((( also results in floor 3.
+()) and ))( both result in floor -1 (the first basement level).
+))) and )())()) both result in floor -3.
+To what floor do the instructions take Santa?
+
+------------------
 This is the input I was given:
-```{r echo=FALSE}
+```{r, warning = FALSE, echo=FALSE}
 input <- read.table("Day1_Input1.csv")
 input <- input$V1
 print(input)
@@ -21,7 +37,56 @@ A quick and dirty solution would be to count the nos of '(' and ')' and then tak
 ```{r }
 up   <- str_count(input, "\\(")
 down <- str_count(input, "\\)")
-floor <- up - down 
+floor_final <- up - down 
 ```
 
-Santa goes `up =` `r up` floors and `down =` `r down` floors taking him to `floor =` `r floor`.
+Santa goes `up = `r up`` floors and `down = `r down`` floors taking him to `floor_final = `r floor_final``.
+
+## PART 2
+Now, given the same instructions, find the position of the first character that causes him to enter the basement (floor -1). The first character in the instructions has position 1, the second character has position 2, and so on.
+
+For example:
+
+) causes him to enter the basement at character position 1.
+()()) causes him to enter the basement at character position 5.
+What is the position of the character that causes Santa to first enter the basement?
+
+```{r}
+input_long <- str_split(input, "")[[1]]
+# Loop through the input
+input_len <- length(input_long)
+floor <- vector(mode = "integer", length=input_len+1)
+floor[1] <- 0
+for(i in 1:input_len){
+  if(input_long[i] == "("){
+    floor[i+1] <- floor[i] + 1
+    }
+  else{
+    if(input_long[i] == ")"){
+      floor[i+1] <- floor[i] - 1
+    }
+    else print("error - not '(' or ')'")
+  }
+}
+```
+
+
+
+On which moves/characters did Santa reach the basement? Need to remember to subtract 1 since we added an initial entry to the `floor` vector so that it started from floor 0 
+```{r}
+which(floor==-1) - 1
+```
+
+Plot Santa's path to see his route...
+```{r plot path}
+cbind(move=1:length(floor),floor) %>% 
+  as.data.frame() %>% 
+  ggplot(aes(x=move,y=floor)) + 
+  geom_line()
+```
+
+Someone's been pulling his leg! How many times does he actually pass through his final destination floor of 138 before the end of his instructions?
+```{r}
+which(floor==138) - 1
+```
+

@@ -1,21 +1,27 @@
 AoC 2015 Day 1
 ================
 
-``` r
-knitr::opts_chunk$set(warning = FALSE, message = FALSE)
-library(tidyverse)
-```
+## PART 1
 
-    ## -- Attaching packages --------------------------------------- tidyverse 1.3.1 --
+Santa is trying to deliver presents in a large apartment building, but
+he can’t find the right floor - the directions he got are a little
+confusing. He starts on the ground floor (floor 0) and then follows the
+instructions one character at a time.
 
-    ## v ggplot2 3.3.5     v purrr   0.3.4
-    ## v tibble  3.1.2     v dplyr   1.0.7
-    ## v tidyr   1.1.3     v stringr 1.4.0
-    ## v readr   1.4.0     v forcats 0.5.1
+An opening parenthesis, (, means he should go up one floor, and a
+closing parenthesis, ), means he should go down one floor.
 
-    ## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
-    ## x dplyr::filter() masks stats::filter()
-    ## x dplyr::lag()    masks stats::lag()
+The apartment building is very tall, and the basement is very deep; he
+will never find the top or bottom floors.
+
+For example:
+
+(()) and ()() both result in floor 0. ((( and (()(()( both result in
+floor 3. ))((((( also results in floor 3. ()) and ))( both result in
+floor -1 (the first basement level). ))) and )())()) both result in
+floor -3. To what floor do the instructions take Santa?
+
+------------------------------------------------------------------------
 
 This is the input I was given:
 
@@ -27,8 +33,72 @@ then take the difference to determine the floor.
 ``` r
 up   <- str_count(input, "\\(")
 down <- str_count(input, "\\)")
-floor <- up - down 
+floor_final <- up - down 
 ```
 
-Santa goes `up =` 3569 floors and `down =` 3431 floors taking him to
-`floor =` 138.
+Santa goes `up = 3569` floors and `down = 3431` floors taking him to
+`floor_final = 138`.
+
+## PART 2
+
+Now, given the same instructions, find the position of the first
+character that causes him to enter the basement (floor -1). The first
+character in the instructions has position 1, the second character has
+position 2, and so on.
+
+For example:
+
+) causes him to enter the basement at character position 1. ()()) causes
+him to enter the basement at character position 5. What is the position
+of the character that causes Santa to first enter the basement?
+
+``` r
+input_long <- str_split(input, "")[[1]]
+# Loop through the input
+input_len <- length(input_long)
+floor <- vector(mode = "integer", length=input_len+1)
+floor[1] <- 0
+for(i in 1:input_len){
+  if(input_long[i] == "("){
+    floor[i+1] <- floor[i] + 1
+    }
+  else{
+    if(input_long[i] == ")"){
+      floor[i+1] <- floor[i] - 1
+    }
+    else print("error - not '(' or ')'")
+  }
+}
+```
+
+On which moves/characters did Santa reach the basement? Need to remember
+to subtract 1 since we added an initial entry to the `floor` vector so
+that it started from floor 0
+
+``` r
+which(floor==-1) - 1
+```
+
+    ## [1] 1771 1773 1775 1787 6231 6233
+
+Plot Santa’s path to see his route…
+
+``` r
+cbind(move=1:length(floor),floor) %>% 
+  as.data.frame() %>% 
+  ggplot(aes(x=move,y=floor)) + 
+  geom_line()
+```
+
+![](AoC_2015_Day-1_files/figure-gfm/plot%20path-1.png)<!-- -->
+
+Someone’s been pulling his leg! How many times does he actually pass
+through his final destination floor of 138 before the end of his
+instructions?
+
+``` r
+which(floor==138) - 1
+```
+
+    ##  [1]  676  680  682  684  688  692  694  706  720  742  750  810  814  816  818
+    ## [16]  824  826 1070 1074 1076 6992 6994 6998 7000
